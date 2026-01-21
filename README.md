@@ -48,11 +48,14 @@ Three parameters that need to be set:
 * `output_dir`: location for the final AMRFP output files (labelled <accession>_amrfinder.txt). **ALL** output files should be put here, as the pipeline will check against all accessions in `file_list` and skip any which have already been completed
 * `archive_location`: folder where the ATB archives are stored
 * `file_list`: list of files to process, extracted from `file_list.all.latest.tsv.gz`
-* `-profile massive`: set this is running on the M3 cluster at Monash, otherwise execution will be local
+* `-profile massive`: set this if running on the M3 cluster at Monash, otherwise execution will be local
 
 ```
 conda activate /scratch2/md52/conda_envs/atb-amrfp
-amrfp_atb.nf --output_dir <output_dir_location> --archive_location <archive_folder> --file_list file_list_n2_50001.tsv -profile massive
+
+amrfp_atb.nf --output_dir <output_dir_location> \
+--archive_location <archive_folder> \
+--file_list file_list_n2_50001.tsv -profile massive
 ```
 
 ## Workflow
