@@ -69,6 +69,8 @@ amrfinder --name $accession -n $fasta_file --print_node --plus -O $organism -o $
 
 **The work directory should be removed between each run to prevent disk space issues**
 
+Keeping track of commands and progress, as well as AMRFP version and database versions [here](https://github.com/jhawkey/atb-amrfp-nf/blob/main/RunLog.md)
+
 ## Contributions
 
 This pipeline was workshopped at the IMMEM 2025 Hackathon by Jane Hawkey, Raphi Sieber, and  Erkison Ewomazino Odih.
