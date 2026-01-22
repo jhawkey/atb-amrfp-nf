@@ -13,3 +13,6 @@ conda activate /scratch2/md52/conda_envs/atb-amrfp
 --file_list /scratch2/md52/atb_archives/file_list_n2_50001.tsv \
 -profile massive
 ```
+
+First chunk of 50,000 genomes had a final work directory size of 392Gb. The final output directory is still in the Mbs. So we can definitely double the number of genomes being processed at one time, plus add in the nf-boost cleanup functionality.
+
