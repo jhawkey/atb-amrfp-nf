@@ -27,3 +27,13 @@ Running (note this now includes the nf-boost in the config file, check how big w
 ./amrfp_atb.nf --output_dir /scratch2/md52/atb_amrfp_2026-01-21 --archive_location /scratch2/md52/atb_archives --file_list /scratch2/md52/atb_archives/file_list_n50002_150001.tsv -profile massive
 ```
 
+## 2026-01-26
+Next 100,000 genomes (previous set took 1d5h to complete). Work dir was only a few 100Gb so definitely nf-boost cleanup function worked as expected. Weird though that nf said it was running only 99,991 genomes but anyway
+```
+(head -n 1 file_list_n150002_200001.tsv; tail -n +2 file_list_n150002_200001.tsv; tail -n +2 file_list_n200002_250001.tsv) > file_list_n150002_250001.tsv 
+```
+
+Running
+```
+./amrfp_atb.nf --output_dir /scratch2/md52/atb_amrfp_2026-01-21 --archive_location /scratch2/md52/atb_archives --file_list /scratch2/md52/atb_archives/file_list_n150002_250001.tsv -profile massive
+```
