@@ -37,3 +37,11 @@ Running
 ```
 ./amrfp_atb.nf --output_dir /scratch2/md52/atb_amrfp_2026-01-21 --archive_location /scratch2/md52/atb_archives --file_list /scratch2/md52/atb_archives/file_list_n150002_250001.tsv -profile massive
 ```
+
+## 2026-01-28
+
+```
+(head -n 1 file_list_n250002_300001.tsv; tail -n +2 file_list_n250002_300001.tsv; tail -n +2 file_list_n300002_350001.tsv) > file_list_n250002_350001.tsv
+./amrfp_atb.nf --output_dir /scratch2/md52/atb_amrfp_2026-01-21 --archive_location /scratch2/md52/atb_archives --file_list /scratch2/md52/atb_archives/file_list_n250002_350001.tsv -profile massive
+```
+
