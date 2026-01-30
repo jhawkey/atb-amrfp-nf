@@ -45,3 +45,25 @@ Running
 ./amrfp_atb.nf --output_dir /scratch2/md52/atb_amrfp_2026-01-21 --archive_location /scratch2/md52/atb_archives --file_list /scratch2/md52/atb_archives/file_list_n250002_350001.tsv -profile massive
 ```
 
+## 2026-01-30
+First create new set of files that are 100,000 in size. Mean's next run we'll ignore the first 50,000 but easier to keep track of going forward
+```
+# get header
+zcat file_list.all.latest.tsv.gz | head -1 > header.tmp
+# split into 100,000 chunks
+zcat file_list.all.latest.tsv.gz | tail -n +2 | split -l 100000 -d --additional-suffix=.tsv - file_list.chunk_
+# rename with ranges and add header to each file
+for file in file_list.chunk_*.tsv; do
+  chunk_num=$(echo "$file" | sed 's/file_list.chunk_0*//' | sed 's/.tsv//')
+  start=$((10#$chunk_num * 100000 + 1))
+  end=$((start + $(wc -l < "$file") - 1))
+  new_name="file_list.lines_${start}-${end}.tsv"
+  cat header.tmp "$file" > "$new_name"
+  rm "$file"
+done
+```
+
+Now run next set
+```
+./amrfp_atb.nf --output_dir /scratch2/md52/atb_amrfp_2026-01-21 --archive_location /scratch2/md52/atb_archives --file_list /scratch2/md52/atb_archives/file_list.lines_300001-400000.tsv -profile massive
+```
