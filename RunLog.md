@@ -67,3 +67,37 @@ Now run next set
 ```
 ./amrfp_atb.nf --output_dir /scratch2/md52/atb_amrfp_2026-01-21 --archive_location /scratch2/md52/atb_archives --file_list /scratch2/md52/atb_archives/file_list.lines_300001-400000.tsv -profile massive
 ```
+
+## 2026-03-30
+Eventually updated the number of genomes being processed at one time to 200,000.
+
+**Now running the 2025-05 incremental release**
+When I started this process, this release hadn't been made available yet. Including it now.
+
+First, extract wget commands for all the archives for this release and download them:
+```
+gunzip -c file_list.all.latest.tsv.gz | awk -F"\t" 'NR>1 && /202505/ {print "wget -O "$4" "$5}' | uniq > wget_cmds.txt
+while read line; do echo $line; $line; done < wget_cmds.txt
+```
+
+Create the chunked set of 200,000 files, but only do it for those in the incremental release.
+```
+# Extract header
+zcat file_list.all.latest.tsv.gz | head -1 > header.tmp
+
+# Filter for incr_release.202505 lines and split into 200k-line chunks
+zcat file_list.all.latest.tsv.gz | tail -n +2 | grep 'incr_release\.202505' | split -l 200000 --numeric-suffixes=1 --additional-suffix=.tsv - file_list_chunk_
+
+# Prepend header to each chunk and rename
+for file in file_list_chunk_*.tsv; do
+    chunk_num=$(echo "$file" | sed 's/file_list_chunk_0*\([0-9]*\).tsv/\1/')
+    start_line=$(( ($chunk_num - 1) * 200000 + 2 ))
+    end_line=$(( $chunk_num * 200000 + 1 ))
+    new_name="file_list_incr_202505_n${start_line}_${end_line}.tsv"
+    cat header.tmp "$file" > "$new_name" && rm "$file"
+done
+
+rm header.tmp
+```
+
+The name of the species column has changed from `species_sylph` to `sylph_species`. However it's still the second column of the file. The `species_miniphy` column is also now missing (column 3). Have updated the nextflow pipe to take this into account.
