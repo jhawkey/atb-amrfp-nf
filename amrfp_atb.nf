@@ -63,9 +63,9 @@ workflow {
         def parts = line.split('\t')
         def accession = parts[0]
         def gtdb_spp = parts[1]
-        def archive_name = parts[4]
+        def archive_name = parts[3]
         def archive_path = "$params.archive_location/${archive_name}"
-        def fasta = parts[3]
+        def fasta = parts[2]
         
         //get the AMRFP organism, return null if there isn't one
         def amrfp_org = SPECIES_MAPPING.get(gtdb_spp, null)
