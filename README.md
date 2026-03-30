@@ -21,24 +21,22 @@ Second, the ATB archives need to be downloaded to the cluster and placed in a ce
 
 Download the list of all files in ATB from OSF into your central ATB directory.
 ```
-wget -O file_list.all.latest.tsv.gz https://osf.io/zxfmy/files/4yv85
+wget -O file_list.all.latest.tsv.gz https://osf.io/zxfmy/files/3xs6h
 ```
 
 Then use this file to download each of the archive files for ATB into your central directory.
 ```
-gunzip -c file_list.all.latest.tsv.gz  | awk -F"\t" 'NR>1 {print "wget -O "$5" "$6}' | uniq | bash
+gunzip -c file_list.all.latest.tsv.gz  | awk -F"\t" 'NR>1 {print "wget -O "$4" "$5}' | uniq | bash
 ```
 
-Note that this file only include metadata on the genomes from the first release, 0.2, and the incremental release 2024-08.
+This file includes metadata on the genomes from the first release, 0.2, the incremental release 2024-08, and the incremental 2025-05 release.
 
-It **does not** include the genome information for genomes in the 2025-05 release.
-
-Finally, file_list needs to be broken up into chunks of 50,000. This is so the pipeline will only ever process 50,000 genomes at a time, to prevent the working directory from getting too large and overwhelming disk space on the cluster. 
+Finally, file_list needs to be broken up into chunks of 200,000. This is so the pipeline will only ever process 200,000 genomes at a time, to prevent the working directory from getting too large and overwhelming disk space on the cluster. The pipe also uses nf-boost to assist with cleanup as it's running.
 
 ```
 zcat file_list.all.latest.tsv.gz | head -1 > header.tmp
-zcat file_list.all.latest.tsv.gz | tail -n +2 | split -l 50000 --numeric-suffixes=1 --additional-suffix=.tsv - file_list_chunk_
-for file in file_list_chunk_*.tsv; do chunk_num=$(echo "$file" | sed 's/file_list_chunk_0*\([0-9]*\).tsv/\1/'); start_line=$(( ($chunk_num - 1) * 50000 + 2 )); end_line=$(( $chunk_num * 50000 + 1 )); new_name="file_list_n${start_line}_${end_line}.tsv"; cat header.tmp "$file" > "$new_name" && rm "$file"; done
+zcat file_list.all.latest.tsv.gz | tail -n +2 | split -l 200000 --numeric-suffixes=1 --additional-suffix=.tsv - file_list_chunk_
+for file in file_list_chunk_*.tsv; do chunk_num=$(echo "$file" | sed 's/file_list_chunk_0*\([0-9]*\).tsv/\1/'); start_line=$(( ($chunk_num - 1) * 200000 + 2 )); end_line=$(( $chunk_num * 200000 + 1 )); new_name="file_list_n${start_line}_${end_line}.tsv"; cat header.tmp "$file" > "$new_name" && rm "$file"; done
 ```
 
 ## Usage
