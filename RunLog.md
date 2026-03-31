@@ -77,6 +77,7 @@ When I started this process, this release hadn't been made available yet. Includ
 First, extract wget commands for all the archives for this release and download them:
 ```
 gunzip -c file_list.all.latest.tsv.gz | awk -F"\t" 'NR>1 && /202505/ {print "wget -O "$4" "$5}' | uniq > wget_cmds.txt
+sort -u wget_cmds.txt > wget_cmds_unique.txt
 while read line; do echo $line; $line; done < wget_cmds.txt
 ```
 
