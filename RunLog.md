@@ -102,3 +102,25 @@ rm header.tmp
 ```
 
 The name of the species column has changed from `species_sylph` to `sylph_species`. However it's still the second column of the file. The `species_miniphy` column is also now missing (column 3). Have updated the nextflow pipe to take this into account.
+
+## 2026-04-14
+
+All samples now completed. Asked Warp AI (used CodeX and Claude) to write some bash code to help me work out if there were any samples that were missing from the output directory. It wrote the following:
+
+```
+tmp_existing=$(mktemp)
+find /scratch2/md52/atb_amrfp_2026-01-21 -type f -name '*_amrfinder.txt' -printf '%f\n' | sed 's/_amrfinder\.txt$//' > "$tmp_existing"
+awk -F '\t' -v out='/scratch2/md52/incomplete_atb_amrfp.txt' '
+NR==FNR { have[$1]=1; next }
+FNR==1 { print > out; next }
+!($1 in have) { print > out; missing++ }
+END { print missing+0 }
+' "$tmp_existing" <(gzip -dc /scratch2/md52/atb_archives/file_list.all.latest.tsv.gz)
+rm -f "$tmp_existing"
+```
+
+There were 7 genomes where we had no output file. Re-running just these using the `incomplete_atb_amrfp.txt` file.
+
+```
+./amrfp_atb.nf --output_dir /scratch2/md52/atb_amrfp_2026-01-21 --archive_location /scratch2/md52/atb_archives --file_list /scratch2/md52/incomplete_atb_amrfp.txt -profile massive
+```
