@@ -124,3 +124,27 @@ There were 7 genomes where we had no output file. Re-running just these using th
 ```
 ./amrfp_atb.nf --output_dir /scratch2/md52/atb_amrfp_2026-01-21 --archive_location /scratch2/md52/atb_archives --file_list /scratch2/md52/incomplete_atb_amrfp.txt -profile massive
 ```
+
+Genomes failed due to out of memory errors from AMRFP, could not get them to pass. Leaving for now.
+
+## 2026-04-22
+
+Combining all files into a single file. Cannot use a simple `cat` command to do this as ~2.7 million files is too many for the os to pass to the command.
+```
+# get header
+find /scratch2/md52/atb_amrfp_2026-01-21 -type f -name '*_amrfinder.txt' -print -quit | xargs head -n 1 | gzip -c > /scratch2/md52/AMRFP_results.tsv.gz
+# concat all files sans header
+find /scratch2/md52/atb_amrfp_2026-01-21 -type f -name '*_amrfinder.txt' -print0 | xargs -0 -n 1000 tail -q -n +2 | gzip -c >> /scratch2/md52/AMRFP_results.tsv.gz
+```
+
+
+
+
+
+
+
+
+
+
+
+
