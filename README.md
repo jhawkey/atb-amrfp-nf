@@ -72,6 +72,45 @@ amrfinder --name $accession -n $fasta_file --print_node --plus -O $organism -o $
 
 Keeping track of commands and progress, as well as AMRFP version and database versions [here](https://github.com/jhawkey/atb-amrfp-nf/blob/main/RunLog.md)
 
+## Prepare files for OSF
+
+For the upload to OSF we need to:
+1) concatenate all results files into a single file called `AMRFP_results.tsv.gz`
+2) create the `AMRFP_status.tsv.gz` file which lists the status of every sample in ATB (PASS/FAIL for the run, if PASS but no hits, state this in the comments column)
+3) create `amrfinderplus.parquet`, which adds two additional columns (genus and species) to the end of the AMRFP_results.tsv.gz file, so it can be filtered appropriately by the ATB cli
+
+### File concatenation
+```
+# get header
+find /scratch2/md52/atb_amrfp_2026-01-21 -type f -name '*_amrfinder.txt' -print -quit | xargs head -n 1 | gzip -c > /scratch2/md52/AMRFP_results.tsv.gz
+# concat all files sans header
+find /scratch2/md52/atb_amrfp_2026-01-21 -type f -name '*_amrfinder.txt' -print0 | xargs -0 -n 1000 tail -q -n +2 | gzip -c >> /scratch2/md52/AMRFP_results.tsv.gz
+```
+
+### Create status file
+Use the `generate_amr_status.py` file in this repo. Requires `file_list.all.latest.tsv.gz` and `incomplete_atb_amrfp.txt`, which lists all samples which did not successfully complete through the pipeline.
+This script needs python 3 but has no other dependencies.
+
+### Create the parquet database file
+Use the `create_amrfp_parquet.R` file. Needs an **uncompressed version of AMRFP_results.tsv** as input, alongside `file_list.all.latest.tsv.gz` which is where it will get the genus and species information from.
+Requires the following libraries to be installed:
+  * dplyr
+  * tidyr
+  * arrow
+
+Will create an output folder called `parquet_out` which will contain one or more .parquet files that can be concatenated using the following commands:
+```
+library(arrow)
+final_table <- open_dataset("parquet_out")
+write_parquet(final_table, "amrfinderplus.parquet")
+```
+
+Check that final table and the original file contain the same number of rows
+```
+dim(final_table) # from above
+results_ds$num_rows # see how to read in from the create_amrfp_parquet.R script, is quick
+```
+
 ## Contributions
 
 This pipeline was workshopped at the IMMEM 2025 Hackathon by Jane Hawkey, Raphi Sieber, and  Erkison Ewomazino Odih.
